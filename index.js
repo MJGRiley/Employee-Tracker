@@ -10,10 +10,10 @@ connection.connect((err) =>{
       if (err) {throw(err)}
       setEList()
       setDList()
-      setRList()
+      //setRList()
       whatToDo()
   })
-  
+
 const setEList = () => {
   eList = []
   connection.query(
@@ -22,31 +22,39 @@ const setEList = () => {
     data.forEach(name =>{
       eList.push(`${name.name}`)
     })
+    eList.push('None')
   })
 }
 
 const setDList = () => {
-  dList = []
   connection.query(
     `SELECT dept_name FROM department`,
     (err,data) => { if (err) { throw(err) }
-    data.forEach(name =>{
-      dList.push(`${name.name}`)
+    data.forEach(dept =>{
+      dList.push(`${dept.dept_name}`)
     })
+    console.log(dList)
   })
 }
 
-const setRList = () => {
+const getR = () => {
   rList = []
   connection.query(
     `SELECT title FROM role`,
     (err,data) => { if (err) { throw(err) }
-    data.forEach(name =>{
-      rList.push(`${name.name}`)
+    data.forEach(role =>{
+      rList.push(`${role.title}`)
+    })
+    inquire.prompt([{
+      type: 'list',
+      message: 'Choose Employee\s Role',
+      name: 'role',
+      choice: rList
+    }]).then((answer) => {
+      return answer.role
     })
   })
 }
-
 // TODO:console.log(appTitle())
 
 
@@ -118,37 +126,26 @@ function dispByMgr() {
 }
 
 function addEmployee() {
-    const tRole = ''
+    let tRole = ''
+    inquire.prompt(empQs)
+    .then((answers) => {
+      console.log(answers)
+      console.log()
+      let tRole = getR()
+    })
+    .then ((answers) => {
+      console.log(answers)
+      
+    //connection.query(
+      // `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+      // VALUES ${answers.fName.toLowerCase()},${answers.lName.toLowerCase()}, ${tRole}, ${answers.manager}`,
+      // (err,data) => { if (err){ console.log(err)}
+      // console.table(data)
+      // dispBy()
+      })
     
-    inquire.prompt(empQs).then((answers) =>{
-      switch(answers.role){
-        case 'Sales Lead': tRole = 1;
-        break;
-        case 'Sales Person': tRole = 2;
-        break;
-        case 'Lead Engineer': tRole = 3;
-        break;
-        case 'Software Engineer': tRole = 4;
-        break;
-        case 'Account Manager': tRole = 5;
-        break;
-        case 'Accountant': tRole = 6;
-        break;
-        case 'Legal Team Lead': tRole = 7;
-        break;
-        case 'Lawyer': tRole = 8;
-        break;
-      }
-    connection.query(
-      `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-      VALUES ${answers.fName.toLowerCase()},${answers.lName.toLowerCase()}, ${tRole}, ${answers.manager}`,
-      (err,data) => { if (err){ console.log(err)}
-      console.table(data)
-      dispBy()
-      }
-    )
-  })
-}
+  }
+
 //Bonus
 // function removeEmployee() {
 //     console.log('Remove Employee')
